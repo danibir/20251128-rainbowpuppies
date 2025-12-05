@@ -1,6 +1,12 @@
-const index_get = (req, res)=>{
+const Pup = require('../models/mod-pup')
+
+const index_get = async (req, res)=>{
     console.log('getting index')
-    res.render('index')
+    Pup.find()
+    .then(resu => {
+        console.log(resu)
+        res.render('index', { pups: resu })
+    })
 }
 
 module.exports = {
