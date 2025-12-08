@@ -5,7 +5,7 @@ const index_get = async (req, res)=>{
     Pup.find()
     .then(resu => {
         console.log(resu)
-        res.render('index', { pups: resu })
+        res.render('index', { user: req.session.user, pups: resu })
     })
 }
 
