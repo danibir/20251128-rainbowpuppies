@@ -18,15 +18,15 @@ app.use(session({
     saveUninitialized: true,
 }))
 
-const MONGODB_URI = "mongodb://10.12.15.152:27017"
-const DB_NAME = "chromiccanine"
+    const MONGODB_URI = "mongodb://10.12.15.152:27017"
+    const DB_NAME = "chromiccanine"
 
-mongoose.connect(MONGODB_URI, {dbName:DB_NAME})
-    .then((resu)=>{
-        console.log('connected')
-        app.listen(3000)
+    mongoose.connect(MONGODB_URI, {dbName:DB_NAME})
+        .then((resu)=>{
+            console.log('connected')
+            app.listen(3000)
 
 
-        app.use('/', route_default)
-        app.use('/', route_profile)
-    })
+            app.use('/', route_default)
+            app.use('/', route_profile)
+        })

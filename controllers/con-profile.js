@@ -1,17 +1,20 @@
 const User = require('../models/mod-user')
 
-const profile = (req, res) => {
+const profile = (req, res) => 
+{
     console.info('reached profile, rendering')
     res.render('profile', {user: req.session.user})
 }
-const logout = (req, res) => {
+const logout = (req, res) => 
+{
     console.info('logout request, logging out')
     req.session.destroy()
     // Implement logout logic here
     res.redirect('/')
 }
 
-const getlogin = (req, res) => {
+const getlogin = (req, res) => 
+{
     console.info('login request')
     if(req.session.flash) {
         console.log('Flash message:', req.session.flash)
@@ -22,7 +25,8 @@ const getlogin = (req, res) => {
     createFlashMessage(req, 'empty', '')
     res.render('login', {flash: req.session.flash || null})
 }
-const postlogin = async (req, res) => {
+const postlogin = async (req, res) => 
+{
     console.info('login submit')
     
     // logic?
@@ -40,7 +44,7 @@ const postlogin = async (req, res) => {
         console.error('error at login:', error)
         createFlashMessage(req, 'error', 'An error occurred. Please try again.')
         res.redirect('/login')
-        return;
+        return
     }
 
     if (!username || !password) { //with forms required variable, this error *should* be unreachable
@@ -50,13 +54,14 @@ const postlogin = async (req, res) => {
         return
     }
 
-    console.warn('login fail: denied');    
+    console.warn('login fail: denied')
     createFlashMessage(req, 'error', 'Wrong username or password! Please try again.')
     res.redirect('/login')
 }
 
-const getsignup = (req, res) => {
-    console.log('sign uprequest')
+const getsignup = (req, res) => 
+{
+    console.log('sign up request')
 
 
     if(req.session.flash) {
@@ -69,20 +74,22 @@ const getsignup = (req, res) => {
     res.render('signup', {flash: req.session.flash || null})
 }
 
-const postsignup = async (req, res) => {
-    console.info('post submit')
+const postsignup = async (req, res) => 
+{
+    console.info('signup submit')
     
     // logic?
 
-    const {username, password} = req.body
-    console.log([username, password])
+    const user = User(req.body)
+    console.log(user)
 
     try {   
-        const user = await User.findOne({username})
-        console.log(user)
-        if (!user) {
-            User.insertOne({username, password})
-            req.session.user = {username}
+        const userfind = await User.findOne({ username: user.username })
+        console.log(userfind)
+        if (!userfind) {
+            await user.save()
+
+            req.session.user = user
             console.warn('signup success')
             res.redirect('/profile')
             return
@@ -95,7 +102,7 @@ const postsignup = async (req, res) => {
         }
     } catch (error) {
         console.error('error at signup:', error)
-        createFlashMessage(req, 'error', 'An error occurred. Please try again.')
+        createFlashMessage(req, 'error', `An error occurred. Please try again.`)
         res.redirect('/signup')
         return
     }
