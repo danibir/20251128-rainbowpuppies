@@ -1,11 +1,14 @@
-const User = require('../models/mod-user')
+const User = require('../models/mod-user.js')
 
-const profile = (req, res) => 
+const profile_get = (req, res) => 
 {
     console.info('reached profile, rendering')
-    res.render('profile', {user: req.session.user})
+    const user = req.session.user
+    if (!user)
+        res.redirect('login')
+    res.render('profile', { title: `Profile - ${user.username}`, user })
 }
-const logout = (req, res) => 
+const logout_post = (req, res) => 
 {
     console.info('logout request, logging out')
     req.session.destroy()
@@ -13,19 +16,21 @@ const logout = (req, res) =>
     res.redirect('/')
 }
 
-const getlogin = (req, res) => 
+const login_get = (req, res) => 
 {
     console.info('login request')
-    if(req.session.flash) {
-        console.log('Flash message:', req.session.flash)
-    }
     
     // logic?
-
-    createFlashMessage(req, 'empty', '')
-    res.render('login', {flash: req.session.flash || null})
+    if (req.session.user)
+    {
+        res.redirect('/profile')
+    }
+    else
+    {
+        res.render('login', { user: NaN, title: "Log in", flash: NaN })
+    }
 }
-const postlogin = async (req, res) => 
+const login_post = async (req, res) => 
 {
     console.info('login submit')
     
@@ -33,101 +38,39 @@ const postlogin = async (req, res) =>
 
     const {username, password} = req.body
 
-    try {   
+    try 
+    {
         const user = await User.findOne({username})
-        if (user && user.password === password) {
+        if (user)
+            console.log("found user")
+        const ok = await user.verifyPassword(password)
+        if (user && ok) 
+        {
             req.session.user = {username: user.username}
             res.redirect('/profile')
             return
         }
-    } catch (error) {
+    } catch (error) 
+    {
         console.error('error at login:', error)
-        createFlashMessage(req, 'error', 'An error occurred. Please try again.')
         res.redirect('/login')
         return
     }
 
-    if (!username || !password) { //with forms required variable, this error *should* be unreachable
+    if (!username || !password) //with forms required variable, this error *should* be unreachable
+    { 
         console.warn('login fail: missing username or password')
-        createFlashMessage(req, 'error', 'Please provide both username and password.')
         res.redirect('/login')
         return
     }
 
     console.warn('login fail: denied')
-    createFlashMessage(req, 'error', 'Wrong username or password! Please try again.')
     res.redirect('/login')
 }
 
-const getsignup = (req, res) => 
-{
-    console.log('sign up request')
-
-
-    if(req.session.flash) {
-        console.log('Flash message:', req.session.flash)
-    }
-    
-    // logic?
-
-    createFlashMessage(req, 'empty', '')
-    res.render('signup', {flash: req.session.flash || null})
-}
-
-const postsignup = async (req, res) => 
-{
-    console.info('signup submit')
-    
-    // logic?
-
-    const user = User(req.body)
-    console.log(user)
-
-    try {   
-        const userfind = await User.findOne({ username: user.username })
-        console.log(userfind)
-        if (!userfind) {
-            await user.save()
-
-            req.session.user = user
-            console.warn('signup success')
-            res.redirect('/profile')
-            return
-        }
-        else
-        {
-            console.warn('signup fail: username occupied')
-            createFlashMessage(req, 'error', 'Username already taken! Please try another.')
-            res.redirect('/signup')
-        }
-    } catch (error) {
-        console.error('error at signup:', error)
-        createFlashMessage(req, 'error', `An error occurred. Please try again.`)
-        res.redirect('/signup')
-        return
-    }
-
-    if (!username || !password) { //with forms required variable, this error *should* be unreachable
-        console.warn('signup fail: missing username or password')
-        createFlashMessage(req, 'error', 'Please provide both username and password.')
-        res.redirect('/signup')
-        return
-    }
-    
-    console.warn('signup fail: no case')  
-    createFlashMessage(req, 'error', 'An unexpected issue had occurred.')
-    res.redirect('/signup')
-}
-
-function createFlashMessage(req, type, message) {
-    req.session.flash = {type, message}
-}
-
 module.exports = {
-    profile,
-    getlogin,
-    postlogin,
-    logout,
-    getsignup,
-    postsignup
+    profile_get,
+    login_get,
+    login_post,
+    logout_post
 }

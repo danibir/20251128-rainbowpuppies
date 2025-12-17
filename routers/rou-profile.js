@@ -1,22 +1,30 @@
+const db = require('../handler/db-handler')
+
 const express = require('express')
-
-const controller = require('../controllers/con-profile.js')
-
 const router = express.Router()
 
+const controller = require('../controllers/con-profile.js')
+const controller_def = require('../controllers/con-default.js')
 const auth = require('../middleware/mid-auth.js')
 
-router.get('/login', controller.getlogin)
 
-router.post('/login', controller.postlogin)
+db.connectDB()
+.then((resu)=>{
+    if (resu)
+    {
+        router.get('/login', controller.login_get)
 
-router.get('/signup', controller.getsignup)
+        router.post('/login', controller.login_post)
 
-router.post('/signup', controller.postsignup)
+        router.get('/profile', auth.authenticate, controller.profile_get)
 
-router.get('/profile', auth.authenticate, controller.profile)
-
-router.post('/logout', controller.logout)
-
+        router.post('/logout', controller.logout_post)
+    }
+    else
+    {
+        console.log('cant find database')
+        router.use(controller_def.missingdb)
+    }
+})
 
 module.exports = router

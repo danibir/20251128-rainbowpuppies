@@ -1,5 +1,5 @@
 <section id="user" class="centered">
-    <% if(typeof user === 'undefined' || user === null) { %>
+    <% if(user) { %>
         <p>User information is not available.</p>   
     <% } else { %>
         <h2><%= user.username %>'s Profile</h2>

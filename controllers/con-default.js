@@ -5,10 +5,17 @@ const index_get = async (req, res)=>{
     Pup.find()
     .then(resu => {
         console.log(resu)
-        res.render('index', { user: req.session.user, pups: resu })
+        res.render('index', { user: req.session?.user || NaN, pups: resu })
     })
 }
 
+const missingdb = async (req, res)=>{
+    console.log('database fail')
+    res.render('dbfail', { user: req.session?.user || NaN })
+}
+
+
 module.exports = {
-    index_get
+    index_get,
+    missingdb
 }

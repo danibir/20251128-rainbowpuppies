@@ -3,16 +3,15 @@
 <ul>
     <li><a href="/">home</a></li>
     <li><a href="/profile">profile</a></li>
-    <% if(typeof user !== 'undefined' && user !== null) { %>
-                <li>
-                    <form action="/logout" method="post">
-                        <button type="submit">Logout</button>
-                    </form>
-                </li>
-            <% } else { %>
-                <li><a href="/login">Login</a></li>
-                <li><a href="/signup">Sign up</a></li>
-        <% } %>
+    <% if(user) { %>
+            <li>
+                <form action="/logout" method="post">
+                    <button type="submit">Logout</button>
+                </form>
+            </li>
+        <% } else { %>
+            <li><a href="/login">Login</a></li>
+    <% } %>
 
 </ul>
 <br>

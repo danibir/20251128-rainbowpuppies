@@ -1,6 +1,10 @@
 <%- include('./partials/nav') %>
 <h1>Rainbow puppies!</h1>
 
+
 <% for( pup of pups ) { %>
     <%= pup.name %>
+    <img src="http://10.12.15.151/colorpupfolder/<%= pup.imageLink %>.png" alt="">
+    <br>
+    <br>
 <% } %>
